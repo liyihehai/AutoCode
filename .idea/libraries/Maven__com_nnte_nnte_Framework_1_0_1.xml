@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.nnte:nnte_Framework:1.0.1">
+    <CLASSES>
+      <root url="jar://D:/work/apache-maven-3.5.3-bin/m2/com/nnte/nnte_Framework/1.0.1/nnte_Framework-1.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/work/apache-maven-3.5.3-bin/m2/com/nnte/nnte_Framework/1.0.1/nnte_Framework-1.0.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/work/apache-maven-3.5.3-bin/m2/com/nnte/nnte_Framework/1.0.1/nnte_Framework-1.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
