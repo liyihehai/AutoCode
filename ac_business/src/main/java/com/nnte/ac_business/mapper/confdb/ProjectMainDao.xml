@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.nnte.ac_business.mapper.confdb.ProjectMainDao">
+    <resultMap id="ProjectMainResult" type="com.nnte.ac_business.mapper.confdb.ProjectMain">
+        <result column="PROJECT_CODE" property="projectCode"/>
+        <result column="PEOJECT_NAME" property="projectName"/>
+        <result column="ROOT_PACKAGE" property="rootPackage"/>
+        <result column="SUB_CLASS" property="subClass"/>
+        <result column="ROOT_DIR" property="rootDir"/>
+        <result column="CONN_DRIVER_NAME" property="connDriverName"/>
+        <result column="CONN_URL" property="connUrl"/>
+        <result column="CONN_USERNAME" property="connUserName"/>
+        <result column="CONN_PASSWORD" property="connPassword"/>
+    </resultMap>
+    <insert id="addModel" keyProperty="projectCode" useGeneratedKeys="false" parameterType="com.nnte.ac_business.mapper.confdb.ProjectMain">
+        insert into PROJECT_MAIN (PROJECT_CODE,PEOJECT_NAME,ROOT_PACKAGE,SUB_CLASS,ROOT_DIR,CONN_DRIVER_NAME,CONN_URL,CONN_USERNAME,CONN_PASSWORD)
+        values (#{projectCode}, #{projectName}, #{rootPackage}, #{subClass},#{rootDir},#{connDriverName}, #{connUrl}, #{connUserName}, #{connPassword})
+    </insert>
+    <select id="findModelByKey" resultMap="ProjectMainResult" parameterType="java.lang.Integer">
+        select * from PROJECT_MAIN where PROJECT_CODE=#{projectCode}
+    </select>
+    <delete id="deleteModel" parameterType="java.lang.Integer">
+        delete from PROJECT_MAIN where PROJECT_CODE=#{projectCode}
+    </delete>
+    <update id="updateModel" parameterType="com.nnte.ac_business.mapper.confdb.ProjectMain">
+        update PROJECT_MAIN
+        set
+        <if test="projectName!= null"><![CDATA[PEOJECT_NAME=#{projectName},]]></if>
+        <if test="rootPackage!= null"><![CDATA[ROOT_PACKAGE=#{rootPackage},]]></if>
+        <if test="subClass!= null"><![CDATA[SUB_CLASS=#{subClass},]]></if>
+        <if test="rootDir!= null"><![CDATA[ROOT_DIR=#{rootDir},]]></if>
+        <if test="connDriverName!= null"><![CDATA[CONN_DRIVER_NAME=#{connDriverName},]]></if>
+        <if test="connUrl!= null"><![CDATA[CONN_URL=#{connUrl},]]></if>
+        <if test="connUserName!= null"><![CDATA[CONN_USERNAME=#{connUserName},]]></if>
+        <if test="connPassword!= null"><![CDATA[CONN_PASSWORD=#{connPassword}]]></if>
+        where PROJECT_CODE=#{projectCode}
+    </update>
+    <sql id="findQjbOperatorListSql">
+        select * from PROJECT_MAIN t
+        <where>
+            <if test="projectCode!= null"><![CDATA[and t.PROJECT_CODE = #{projectCode}]]></if>
+            <if test="projectName!= null"><![CDATA[and t.PEOJECT_NAME = #{projectName}]]></if>
+            <if test="rootPackage!= null"><![CDATA[and t.ROOT_PACKAGE = #{rootPackage}]]></if>
+            <if test="subClass!= null"><![CDATA[SUB_CLASS=#{subClass},]]></if>
+            <if test="rootDir!= null"><![CDATA[ROOT_DIR=#{rootDir},]]></if>
+            <if test="connDriverName!= null"><![CDATA[and t.CONN_DRIVER_NAME = #{connDriverName}]]></if>
+            <if test="connUrl!= null and userName!=''"><![CDATA[and t.CONN_URL = #{connUrl}]]></if>
+            <if test="connUserName!= null"><![CDATA[and t.CONN_USERNAME = #{connUserName}]]></if>
+            <if test="connPassword!= null"><![CDATA[and t.CONN_PASSWORD = #{connPassword}]]></if>
+        </where>
+        <if test="sort!=null">order by t.${sort} ${dir}</if>
+    </sql>
+    <select id="findModelList" parameterType="com.nnte.ac_business.mapper.confdb.ProjectMain" resultMap="ProjectMainResult">
+        <include refid="findQjbOperatorListSql"/>
+    </select>
+    <select id="findModelCount"  parameterType="com.nnte.ac_business.mapper.confdb.ProjectMain" resultType="java.lang.Integer">
+        SELECT count(1) PG_TOTALCOUNT FROM (
+        <include refid="findQjbOperatorListSql" />
+        <if test="start!= null">  limit #{start},#{limit} </if>
+        ) m
+    </select>
+    <select id="findModelWithPg" parameterType="com.nnte.ac_business.mapper.confdb.ProjectMain" resultMap="ProjectMainResult">
+        <include refid="findQjbOperatorListSql" />
+        <if test="start!= null">  limit #{start},#{limit} </if>
+    </select>
+</mapper>
