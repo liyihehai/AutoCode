@@ -1,6 +1,6 @@
 package ${map.packPath!''};
 
-import ${map.packRootPath!''}.base.BaseService;
+import com.nnte.framework.base.BaseService;
 import org.springframework.stereotype.Component;
 
 @Component

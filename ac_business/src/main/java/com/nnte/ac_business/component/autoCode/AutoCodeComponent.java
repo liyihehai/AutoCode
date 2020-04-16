@@ -260,7 +260,7 @@ public class AutoCodeComponent {
         List<String> makeInfoList = new ArrayList<>();
         for(String table:tables){
             Map<String,Object> retMake=makeAutoCodeFromDBTable(conn,project,fpath,packRootPath,
-                    packpath,table.toUpperCase());
+                    packpath,table);
             List<String> miList=(List<String>)retMake.get("makeInfoList");
             if (miList!=null)
                 makeInfoList.addAll(miList);
