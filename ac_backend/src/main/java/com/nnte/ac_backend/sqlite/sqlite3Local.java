@@ -1,6 +1,6 @@
 package com.nnte.ac_backend.sqlite;
 
-import com.nnte.ac_business.base.DynamicDatabaseSourceHolder;
+import com.nnte.framework.base.DynamicDatabaseSourceHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

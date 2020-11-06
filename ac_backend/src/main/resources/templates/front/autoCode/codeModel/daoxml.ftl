@@ -34,12 +34,14 @@
     <update id="updateModel" parameterType="${map.packPath!''}.${map.classPri!''}">
         update ${map.tableName!''}
         <set>
+            <trim suffixOverrides=",">
         <#assign colstart=0/>
         <#list map.colList as col>
             <#if (map.keyCol.colName!=col.colName || map.keyCol.aiFlag!=1)>
         <if test="${col.colObjectName}!= null"><![CDATA[${col.colName}=<#noparse>#{</#noparse>${col.colObjectName}<#noparse>}</#noparse>,]]></if>
             </#if>
         </#list>
+            </trim>
         </set>
         where ${map.keyCol.colName}=<#noparse>#{</#noparse>${map.keyCol.colObjectName}<#noparse>}</#noparse>
     </update>

@@ -10,7 +10,7 @@ public class ProjectMain extends BaseModel {
     private String rootDir;
     private String connDriverName;
     private String connUrl;
-    private String connUserName;
+    private String connUsername;
     private String connPassword;
 
     public ProjectMain() {
@@ -55,12 +55,12 @@ public class ProjectMain extends BaseModel {
         this.connUrl = connUrl;
     }
 
-    public String getConnUserName() {
-        return connUserName;
+    public String getConnUsername() {
+        return connUsername;
     }
 
-    public void setConnUserName(String connUserName) {
-        this.connUserName = connUserName;
+    public void setConnUsername(String connUserName) {
+        this.connUsername = connUserName;
     }
 
     public String getConnPassword() {

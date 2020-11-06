@@ -10,7 +10,7 @@
         <result column="ROOT_DIR" property="rootDir"/>
         <result column="CONN_DRIVER_NAME" property="connDriverName"/>
         <result column="CONN_URL" property="connUrl"/>
-        <result column="CONN_USERNAME" property="connUserName"/>
+        <result column="CONN_USERNAME" property="connUsername"/>
         <result column="CONN_PASSWORD" property="connPassword"/>
     </resultMap>
     <insert id="addModel" keyProperty="projectCode" useGeneratedKeys="false" parameterType="com.nnte.ac_business.mapper.confdb.ProjectMain">
@@ -26,14 +26,16 @@
     <update id="updateModel" parameterType="com.nnte.ac_business.mapper.confdb.ProjectMain">
         update PROJECT_MAIN
         set
+        <trim suffixOverrides=",">
         <if test="projectName!= null"><![CDATA[PEOJECT_NAME=#{projectName},]]></if>
         <if test="rootPackage!= null"><![CDATA[ROOT_PACKAGE=#{rootPackage},]]></if>
         <if test="subClass!= null"><![CDATA[SUB_CLASS=#{subClass},]]></if>
         <if test="rootDir!= null"><![CDATA[ROOT_DIR=#{rootDir},]]></if>
         <if test="connDriverName!= null"><![CDATA[CONN_DRIVER_NAME=#{connDriverName},]]></if>
         <if test="connUrl!= null"><![CDATA[CONN_URL=#{connUrl},]]></if>
-        <if test="connUserName!= null"><![CDATA[CONN_USERNAME=#{connUserName},]]></if>
-        <if test="connPassword!= null"><![CDATA[CONN_PASSWORD=#{connPassword}]]></if>
+        <if test="connUsername!= null"><![CDATA[CONN_USERNAME=#{connUsername},]]></if>
+        <if test="connPassword!= null"><![CDATA[CONN_PASSWORD=#{connPassword},]]></if>
+        </trim>
         where PROJECT_CODE=#{projectCode}
     </update>
     <sql id="findQjbOperatorListSql">
@@ -46,7 +48,7 @@
             <if test="rootDir!= null"><![CDATA[ROOT_DIR=#{rootDir},]]></if>
             <if test="connDriverName!= null"><![CDATA[and t.CONN_DRIVER_NAME = #{connDriverName}]]></if>
             <if test="connUrl!= null and userName!=''"><![CDATA[and t.CONN_URL = #{connUrl}]]></if>
-            <if test="connUserName!= null"><![CDATA[and t.CONN_USERNAME = #{connUserName}]]></if>
+            <if test="connUsername!= null"><![CDATA[and t.CONN_USERNAME = #{connUsername}]]></if>
             <if test="connPassword!= null"><![CDATA[and t.CONN_PASSWORD = #{connPassword}]]></if>
         </where>
         <if test="sort!=null">order by t.${sort} ${dir}</if>

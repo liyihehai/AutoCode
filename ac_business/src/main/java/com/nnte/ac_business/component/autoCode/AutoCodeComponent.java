@@ -1,13 +1,10 @@
 package com.nnte.ac_business.component.autoCode;
 
-
-import com.nnte.ac_business.annotation.DBSrcTranc;
-import com.nnte.ac_business.base.DynamicDatabaseSourceHolder;
 import com.nnte.ac_business.mapper.confdb.ProjectMain;
 import com.nnte.ac_business.mapper.confdb.ProjectMainService;
-import com.nnte.framework.base.BaseNnte;
-import com.nnte.framework.base.ConnSqlSessionFactory;
-import com.nnte.framework.base.DBSchemaColum;
+import com.nnte.basebusi.annotation.DBSrcTranc;
+import com.nnte.framework.annotation.WorkDBAspect;
+import com.nnte.framework.base.*;
 import com.nnte.framework.utils.FileUtil;
 import com.nnte.framework.utils.FreeMarkertUtil;
 import com.nnte.framework.utils.StringUtils;
@@ -24,13 +21,15 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@WorkDBAspect
+
 public class AutoCodeComponent {
     @Autowired
     private ProjectMainService projectMainService;
     @Autowired
     private ServletContext sc;
     //查询项目列表
-    @DBSrcTranc
+    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
     public Map<String,Object> queryProjectList(Map<String,Object> paramMap){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
         ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
@@ -46,8 +45,23 @@ public class AutoCodeComponent {
         return ret;
     }
 
+    //查询项目列表
+    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
+    public Map<String,Object> queryProjectListWithPage(Map<String,Object> paramMap){
+        Map<String,Object> ret = BaseNnte.newMapRetObj();
+        try {
+            List<ProjectMain> list = projectMainService.queryProjectWithPage(paramMap);
+            ret.put("total", paramMap.get("totalCount"));
+            ret.put("list", list);
+            BaseNnte.setRetTrue(ret, "");
+        }catch (Exception e) {
+            BaseNnte.setRetFalse(ret, 9999, "查询执行异常");
+        }
+        return ret;
+    }
+
     //按项目编号查询指定的单个项目
-    @DBSrcTranc
+    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
     public Map<String,Object> querySingleProject(Map<String,Object> paramMap,Integer projectCode){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
         ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
@@ -69,7 +83,7 @@ public class AutoCodeComponent {
             return false;
         try {
             Connection conn= DynamicDatabaseSourceHolder.initSampleDBSrc(project.getConnDriverName(),project.getConnUrl(),
-                    project.getConnUserName(),project.getConnPassword());
+                    project.getConnUsername(),project.getConnPassword());
             if (conn!=null && !conn.isClosed()){
                 conn.close();
                 return true;
@@ -78,22 +92,45 @@ public class AutoCodeComponent {
         }
         return false;
     }
+
+    //新增或更改项目(简化版)
+    public Map<String,Object> saveProjectSample(ProjectMain saveProject){
+        Map<String,Object> paramMap = new HashMap<>();
+        JSONObject jsonProject = new JSONObject();
+        jsonProject.put("projectCode",saveProject.getProjectCode());
+        jsonProject.put("projectName",saveProject.getProjectName());
+        jsonProject.put("RootPackage",saveProject.getRootPackage());
+        jsonProject.put("subClass",saveProject.getSubClass());
+        jsonProject.put("rootDir",saveProject.getRootDir());
+        jsonProject.put("connDriverName",saveProject.getConnDriverName());
+        jsonProject.put("connUrl",saveProject.getConnUrl());
+        jsonProject.put("connUserName",saveProject.getConnUsername());
+        jsonProject.put("connPassword",saveProject.getConnPassword());
+        return saveProject(saveProject);
+    }
+
     //新增或更改项目
-    @DBSrcTranc(autocommit = false)
-    public Map<String,Object> saveProject(Map<String,Object> paramMap, JSONObject jsonProject){
+    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name,autocommit = false)
+    public Map<String,Object> saveProject(ProjectMain pm){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
-        ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
+    //    ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
         try {
-            ProjectMain pm = (ProjectMain) JSONObject.toBean(jsonProject, ProjectMain.class);
+            ConnSqlSessionFactory cssf = BaseService.getThreadLocalCSSF();
+            if (cssf==null){
+                BaseNnte.setRetFalse(ret,9998,"数据连接错误");
+                return ret;
+            }
+         //   ProjectMain pm = (ProjectMain) JSONObject.toBean(jsonProject, ProjectMain.class);
             if (pm==null || pm.getProjectCode()==null || pm.getProjectCode()<=0)
             {
                 BaseNnte.setRetFalse(ret,1002,"对象转换失败或项目编号错误");
                 return ret;
             }
+            /*
             if (!testProjectDBsrc(pm)){
                 BaseNnte.setRetFalse(ret,1002,"数据连接参数错误");
                 return ret;
-            }
+            }*/
             ProjectMain modifyPm=projectMainService.findModelByKey(cssf,pm.getProjectCode());
             Integer count = 0;
             if (modifyPm==null)
@@ -120,18 +157,17 @@ public class AutoCodeComponent {
         //jdbc:mysql://139.196.177.32:3306/qjb?autoReconnect=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
         String driverName=project.getConnUrl();
         //qjb
-        String userName=project.getConnUserName();
+        String userName=project.getConnUsername();
         //QJBdb_2016
         String passWord=project.getConnPassword();
         return  DynamicDatabaseSourceHolder.initSampleDBSrc(className,
                 driverName,userName,passWord);
     }
     //查询指定数据库的所有表名称
-    @DBSrcTranc
-    public Map<String,Object> queryDBSrcTableNames(Map<String,Object> paramMap,Integer projectCode){
+    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
+    public Map<String,Object> queryDBSrcTableNames(Integer projectCode){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
-        ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
-        ProjectMain project= projectMainService.findModelByKey(cssf,projectCode);
+        ProjectMain project= projectMainService.findModelByKey(projectCode);
         if (project==null)
         {
             BaseNnte.setRetFalse(ret,1002,"取得项目失败");
@@ -167,7 +203,7 @@ public class AutoCodeComponent {
     }
 
     //删除项目
-    @DBSrcTranc
+    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
     public Map<String,Object> delSingleProject(Map<String,Object> paramMap,Integer projectCode){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
         ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
@@ -207,12 +243,12 @@ public class AutoCodeComponent {
         return ret;
     }
 
-    @DBSrcTranc
-    public Map<String,Object> makeAutoCode(Map<String,Object> paramMap,Integer projectCode,
+    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
+    public Map<String,Object> makeAutoCode(Integer projectCode,
                                            String subClass,String[] tables){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
-        ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
-        ProjectMain project= projectMainService.findModelByKey(cssf,projectCode);
+
+        ProjectMain project= projectMainService.findModelByKey(projectCode);
         if (project==null)
         {
             BaseNnte.setRetFalse(ret,1002,"取得项目失败");
@@ -251,7 +287,7 @@ public class AutoCodeComponent {
             return ret;
         }
         Connection conn=DynamicDatabaseSourceHolder.initSampleDBSrc(project.getConnDriverName(),project.getConnUrl(),
-                project.getConnUserName(),project.getConnPassword());
+                project.getConnUsername(),project.getConnPassword());
         if (conn==null || DynamicDatabaseSourceHolder.isConnClosed(conn)){
             BaseNnte.setRetFalse(ret,1002,"建立项目数据库连接失败");
             return ret;

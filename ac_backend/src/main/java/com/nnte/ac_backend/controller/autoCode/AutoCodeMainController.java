@@ -1,10 +1,12 @@
 package com.nnte.ac_backend.controller.autoCode;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.nnte.ac_business.component.autoCode.AutoCodeComponent;
 import com.nnte.ac_business.mapper.confdb.ProjectMain;
 import com.nnte.framework.base.BaseNnte;
 import com.nnte.framework.base.DataLibrary;
 import com.nnte.framework.entity.KeyValue;
+import com.nnte.framework.utils.MapUtil;
 import com.nnte.framework.utils.NumberUtil;
 import com.nnte.framework.utils.StringUtils;
 import net.sf.json.JSONObject;
@@ -58,7 +60,7 @@ public class AutoCodeMainController {
             if (list!=null && list.size()>0)
             {
                 ProjectMain pm = list.get(0);
-                Map<String,Object> retQuery=autoCodeComponent.queryDBSrcTableNames(map,pm.getProjectCode());
+                Map<String,Object> retQuery=autoCodeComponent.queryDBSrcTableNames(pm.getProjectCode());
                 if (BaseNnte.getRetSuc(retQuery)){
                     map.put("tableList",retQuery.get("tableList"));
                 }
@@ -86,21 +88,28 @@ public class AutoCodeMainController {
         if (jsonParam==null)
         {
             BaseNnte.setRetFalse(ret,1002,"参数为空");
-            return BaseNnte.ret2Json(ret);
+            return ret;
         }
         Integer projectCode = NumberUtil.getDefaultInteger(jsonParam.get("projectCode"));
-        Map<String,Object> map=new HashMap<>();
-        ret=autoCodeComponent.queryDBSrcTableNames(map,projectCode);
+        ret=autoCodeComponent.queryDBSrcTableNames(projectCode);
         return ret;
     }
 
     //Ajax操作：保存项目更改，包括新增及更改
     @RequestMapping(value = "onSaveProject")
     @ResponseBody
-    public Map<String,Object> onSaveProject(@RequestBody JSONObject jsonProject){
-        Map<String,Object> map=new HashMap<>();
-        Map<String,Object> ret=autoCodeComponent.saveProject(map,jsonProject);
-        return ret;
+    public Map<String,Object> onSaveProject(@RequestBody Map<String,Object> mapProject){
+        try {
+            Map<String, Object> map = new HashMap<>();
+            ProjectMain dto = new ProjectMain();
+            MapUtil.copyFromSrcMap(mapProject, dto);
+            Map<String, Object> ret = autoCodeComponent.saveProject( dto);
+            return ret;
+        }catch (Exception e){
+            Map<String, Object> ret=BaseNnte.newMapRetObj();
+            BaseNnte.setRetFalse(ret,1001,e.getMessage());
+            return ret;
+        }
     }
 
     //Ajax操作：查询单个项目信息
@@ -124,12 +133,11 @@ public class AutoCodeMainController {
     @RequestMapping(value = "makeAutoCode")
     @ResponseBody
     public Map<String,Object> makeAutoCode(@RequestBody JSONObject jsonProject){
-        Map<String,Object> map=new HashMap<>();
         Integer projectCode= NumberUtil.getDefaultInteger(jsonProject.get("projectCode"));
         String subClass=StringUtils.defaultString(jsonProject.get("subClass"));
         String tables=StringUtils.defaultString(jsonProject.get("tables"));
         String[] tablenames=tables.split(",");
-        Map<String,Object> ret=autoCodeComponent.makeAutoCode(map,projectCode,subClass,tablenames);
+        Map<String,Object> ret=autoCodeComponent.makeAutoCode(projectCode,subClass,tablenames);
         return ret;
     }
 
