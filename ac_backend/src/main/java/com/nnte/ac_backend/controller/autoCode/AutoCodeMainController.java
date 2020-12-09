@@ -52,7 +52,7 @@ public class AutoCodeMainController {
     public ModelAndView projectMgrIndex(ModelAndView modelAndView){
         modelAndView.setViewName("front/autoCode/projectMgrIndex");
         Map<String,Object> map=new HashMap<>();
-        Map<String,Object> ret=autoCodeComponent.queryProjectList(map);
+        Map<String,Object> ret=autoCodeComponent.queryProjectList();
         if (BaseNnte.getRetSuc(ret))
         {
             List<ProjectMain> list=(List<ProjectMain>)ret.get("projectList");
@@ -116,16 +116,14 @@ public class AutoCodeMainController {
     @RequestMapping(value = "queryProjectInfo")
     @ResponseBody
     public Map<String,Object> queryProjectInfo(Integer projectCode) {
-        Map<String,Object> map=new HashMap<>();
-        Map<String,Object> ret=autoCodeComponent.querySingleProject(map,projectCode);
+        Map<String,Object> ret=autoCodeComponent.querySingleProject(projectCode);
         return ret;
     }
 
     @RequestMapping(value = "deleteProject")
     @ResponseBody
     public Map<String,Object> deleteProject(Integer projectCode) {
-        Map<String,Object> map=new HashMap<>();
-        Map<String,Object> ret=autoCodeComponent.delSingleProject(map,projectCode);
+        Map<String,Object> ret=autoCodeComponent.delSingleProject(projectCode);
         return ret;
     }
 

@@ -60,11 +60,19 @@
     <select id="findModelCount"  parameterType="${map.packPath!''}.${map.classPri!''}" resultType="java.lang.Integer">
         SELECT count(1) PG_TOTALCOUNT FROM (
         <include refid="find${map.classPri!''}ListSql" />
-        <if test="start!= null">  limit <#noparse>#{</#noparse>start<#noparse>}</#noparse>,<#noparse>#{</#noparse>limit<#noparse>}</#noparse> </if>
+        <if test="start!= null">  ${map.limitContent!''} </if>
         ) m
     </select>
     <select id="findModelWithPg" parameterType="${map.packPath!''}.${map.classPri!''}" resultMap="${map.classPri!''}Result">
         <include refid="find${map.classPri!''}ListSql" />
-        <if test="start!= null">  limit <#noparse>#{</#noparse>start<#noparse>}</#noparse>,<#noparse>#{</#noparse>limit<#noparse>}</#noparse> </if>
+        <if test="start!= null">  ${map.limitContent!''} </if>
+    </select>
+    <select id="findModelListByIds" parameterType="java.util.List" resultMap="${map.classPri!''}Result">
+        select * from ${map.tableName!''}
+        where ${map.keyCol.colName} in (
+        <foreach collection="list" item="item" separator="," >
+            (<trim suffixOverrides=",">
+                ${r"#{item},"}
+            </trim>)</foreach>)
     </select>
 </mapper>

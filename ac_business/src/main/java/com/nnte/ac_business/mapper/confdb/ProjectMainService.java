@@ -1,5 +1,6 @@
 package com.nnte.ac_business.mapper.confdb;
 
+import com.github.pagehelper.PageInfo;
 import com.nnte.framework.base.BaseService;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,12 @@ public class ProjectMainService extends BaseService<ProjectMainDao,ProjectMain> 
      * */
     public List<ProjectMain> queryProjectWithPage(Map<String,Object> params){
         String statementName = "findModelList";
-        return defaultListWithAutoPage(statementName,params);
+        PageInfo<ProjectMain> pageInfo=defaultListWithAutoPage(statementName,params);
+        if (pageInfo==null){
+            params.put("total",0);
+            return null;
+        }
+        params.put("total",pageInfo.getTotal());
+        return pageInfo.getList();
     }
 }

@@ -2,6 +2,7 @@ package com.nnte.ac_backend.controller.autoCode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.nnte.ac_business.component.autoCode.AutoCodeComponent;
+import com.nnte.ac_business.entity.ErrorCodeLib;
 import com.nnte.ac_business.mapper.confdb.ProjectMain;
 import com.nnte.framework.base.BaseNnte;
 import com.nnte.framework.utils.MapUtil;
@@ -32,7 +33,7 @@ public class ProjectMainController {
         param.put("pageNo", NumberUtil.getDefaultInteger(json.get("current")));
         param.put("limit", NumberUtil.getDefaultInteger(json.get("pageSize")));
         Map ret= autoCodeComponent.queryProjectListWithPage(param);
-        BaseNnte.setRetTrue(ret,ErrorCodeLib.OPE_SUCCESS);
+        BaseNnte.setRetTrue(ret, ErrorCodeLib.OPE_SUCCESS);
         return ret;
     }
     @RequestMapping(value = "/saveAutoCodeProject")

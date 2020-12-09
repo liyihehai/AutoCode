@@ -1,5 +1,6 @@
 package com.nnte.ac_business.component.autoCode;
 
+import com.nnte.ac_business.entity.ErrorCodeLib;
 import com.nnte.ac_business.mapper.confdb.ProjectMain;
 import com.nnte.ac_business.mapper.confdb.ProjectMainService;
 import com.nnte.basebusi.annotation.DBSrcTranc;
@@ -29,12 +30,10 @@ public class AutoCodeComponent {
     @Autowired
     private ServletContext sc;
     //查询项目列表
-    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
-    public Map<String,Object> queryProjectList(Map<String,Object> paramMap){
+    public Map<String,Object> queryProjectList(){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
-        ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
         ProjectMain dto = new ProjectMain();
-        List<ProjectMain> list= projectMainService.findModelList(cssf,dto);
+        List<ProjectMain> list= projectMainService.findModelList(dto);
         if (list!=null)
         {
             BaseNnte.setRetTrue(ret,"");
@@ -46,14 +45,13 @@ public class AutoCodeComponent {
     }
 
     //查询项目列表
-    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
     public Map<String,Object> queryProjectListWithPage(Map<String,Object> paramMap){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
         try {
             List<ProjectMain> list = projectMainService.queryProjectWithPage(paramMap);
             ret.put("total", paramMap.get("totalCount"));
             ret.put("list", list);
-            BaseNnte.setRetTrue(ret, "");
+            BaseNnte.setRetTrue(ret, ErrorCodeLib.OPE_SUCCESS );
         }catch (Exception e) {
             BaseNnte.setRetFalse(ret, 9999, "查询执行异常");
         }
@@ -61,14 +59,12 @@ public class AutoCodeComponent {
     }
 
     //按项目编号查询指定的单个项目
-    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
-    public Map<String,Object> querySingleProject(Map<String,Object> paramMap,Integer projectCode){
+    public Map<String,Object> querySingleProject(Integer projectCode){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
-        ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
-        ProjectMain projectMain= projectMainService.findModelByKey(cssf,projectCode);
+        ProjectMain projectMain= projectMainService.findModelByKey(projectCode);
         if (projectMain!=null)
         {
-            BaseNnte.setRetTrue(ret,"");
+            BaseNnte.setRetTrue(ret,ErrorCodeLib.OPE_SUCCESS);
             ret.put("projectMain",projectMain);
         }
         else
@@ -113,35 +109,28 @@ public class AutoCodeComponent {
     @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name,autocommit = false)
     public Map<String,Object> saveProject(ProjectMain pm){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
-    //    ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
         try {
-            ConnSqlSessionFactory cssf = BaseService.getThreadLocalCSSF();
-            if (cssf==null){
+            BaseService.ConnDaoSession session = BaseService.getThreadLocalSession();
+            if (session==null){
                 BaseNnte.setRetFalse(ret,9998,"数据连接错误");
                 return ret;
             }
-         //   ProjectMain pm = (ProjectMain) JSONObject.toBean(jsonProject, ProjectMain.class);
             if (pm==null || pm.getProjectCode()==null || pm.getProjectCode()<=0)
             {
                 BaseNnte.setRetFalse(ret,1002,"对象转换失败或项目编号错误");
                 return ret;
             }
-            /*
-            if (!testProjectDBsrc(pm)){
-                BaseNnte.setRetFalse(ret,1002,"数据连接参数错误");
-                return ret;
-            }*/
-            ProjectMain modifyPm=projectMainService.findModelByKey(cssf,pm.getProjectCode());
+            ProjectMain modifyPm=projectMainService.findModelByKey(session,pm.getProjectCode());
             Integer count = 0;
             if (modifyPm==null)
-                count = projectMainService.addModel(cssf,pm);
+                count = projectMainService.addModel(session,pm);
             else
-                count = projectMainService.updateModel(cssf,pm);
+                count = projectMainService.updateModel(session,pm);
             if (count==null || !count.equals(1)){
                 BaseNnte.setRetFalse(ret,1002,"对象保存失败");
                 return ret;
             }
-            modifyPm=projectMainService.findModelByKey(cssf,pm.getProjectCode());
+            modifyPm=projectMainService.findModelByKey(session,pm.getProjectCode());
             BaseNnte.setRetTrue(ret, "保存项目成功");
             ret.put("projectMain",modifyPm);
         }catch (Exception e){
@@ -164,7 +153,6 @@ public class AutoCodeComponent {
                 driverName,userName,passWord);
     }
     //查询指定数据库的所有表名称
-    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
     public Map<String,Object> queryDBSrcTableNames(Integer projectCode){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
         ProjectMain project= projectMainService.findModelByKey(projectCode);
@@ -204,16 +192,16 @@ public class AutoCodeComponent {
 
     //删除项目
     @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
-    public Map<String,Object> delSingleProject(Map<String,Object> paramMap,Integer projectCode){
+    public Map<String,Object> delSingleProject(Integer projectCode){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
-        ConnSqlSessionFactory cssf = (ConnSqlSessionFactory)paramMap.get("ConnSqlSessionFactory");
-        ProjectMain project= projectMainService.findModelByKey(cssf,projectCode);
+        BaseService.ConnDaoSession session = BaseService.getThreadLocalSession();
+        ProjectMain project= projectMainService.findModelByKey(session,projectCode);
         if (project==null)
         {
             BaseNnte.setRetFalse(ret,1002,"取得项目失败");
             return ret;
         }
-        Integer count=projectMainService.deleteModel(cssf,projectCode);
+        Integer count=projectMainService.deleteModel(session,projectCode);
         if (count!=null && count.equals(1)){
             BaseNnte.setRetTrue(ret,"删除项目成功");
             ret.put("count",count);
@@ -243,7 +231,6 @@ public class AutoCodeComponent {
         return ret;
     }
 
-    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
     public Map<String,Object> makeAutoCode(Integer projectCode,
                                            String subClass,String[] tables){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
@@ -313,6 +300,15 @@ public class AutoCodeComponent {
         ret.put("makeInfoList",makeInfoList);
         return ret;
     }
+    private String genLimitContentByDriver(String driver){
+        String cLimit = "limit #{start},#{limit}";
+        if (StringUtils.isEmpty(driver))
+            return cLimit;
+        String d=driver.toLowerCase();
+        if (d.indexOf(".postgresql.")>=0)
+            cLimit = "LIMIT #{limit} OFFSET #{start}";
+        return cLimit;
+    }
     //依据指定的表名称创建自动代码
     private Map<String,Object> makeAutoCodeFromDBTable(Connection conn,ProjectMain project,
                                                        String filePath,String packRootPath,
@@ -350,6 +346,7 @@ public class AutoCodeComponent {
         tmpmap.put("keyCol",keyColList.get(0));
         tmpmap.put("classPri",classPri);
         tmpmap.put("tableName",table);
+        tmpmap.put("limitContent",genLimitContentByDriver(project.getConnDriverName()));
         if (existDate!=null)
             tmpmap.put("existDate",existDate);
         List<String> makeInfoList = new ArrayList<>();
