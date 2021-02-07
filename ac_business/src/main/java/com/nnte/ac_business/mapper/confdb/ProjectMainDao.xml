@@ -15,7 +15,7 @@
     </resultMap>
     <insert id="addModel" keyProperty="projectCode" useGeneratedKeys="false" parameterType="com.nnte.ac_business.mapper.confdb.ProjectMain">
         insert into PROJECT_MAIN (PROJECT_CODE,PEOJECT_NAME,ROOT_PACKAGE,SUB_CLASS,ROOT_DIR,CONN_DRIVER_NAME,CONN_URL,CONN_USERNAME,CONN_PASSWORD)
-        values (#{projectCode}, #{projectName}, #{rootPackage}, #{subClass},#{rootDir},#{connDriverName}, #{connUrl}, #{connUserName}, #{connPassword})
+        values (#{projectCode}, #{projectName}, #{rootPackage}, #{subClass},#{rootDir},#{connDriverName}, #{connUrl}, #{connUsername}, #{connPassword})
     </insert>
     <select id="findModelByKey" resultMap="ProjectMainResult" parameterType="java.lang.Integer">
         select * from PROJECT_MAIN where PROJECT_CODE=#{projectCode}

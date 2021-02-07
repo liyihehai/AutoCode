@@ -2,7 +2,7 @@ package com.nnte.ac_backend;
 
 import com.nnte.ac_backend.sqlite.sqlite3Local;
 import com.nnte.ac_business.component.autoCode.AutoCodeComponent;
-import com.nnte.basebusi.annotation.DBSrcTranc;
+import com.nnte.ac_business.config.WorkDBConfig;
 import com.nnte.framework.base.DynamicDatabaseSourceHolder;
 import com.nnte.framework.base.SpringContextHolder;
 import com.zaxxer.hikari.HikariConfig;
@@ -35,10 +35,10 @@ public class NnteAutoCodeApplication
         sqlite3Config.setConnectionTestQuery("SELECT 1");
 
         List<String> sqlite3mappers=new ArrayList<>();
-        sqlite3mappers.add("com.nnte.ac_business.mapper.confdb");
-        ddh.initDataBaseSource(DBSrcTranc.Config_DBSrc_Name,sqlite3Config,sqlite3mappers, AutoCodeComponent.class,true);
+        sqlite3mappers.add(WorkDBConfig.MAPPER_PATH);
+        ddh.initDataBaseSource(WorkDBConfig.DB_NAME,sqlite3Config,sqlite3mappers, AutoCodeComponent.class,true);
 
-        sqlite3Local sqlite3local=SpringContextHolder.getBean("sqlite3Local");
+        sqlite3Local sqlite3local=SpringContextHolder.getBean(sqlite3Local.class);
         sqlite3local.initSchema();
     }
 }

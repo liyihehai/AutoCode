@@ -1,5 +1,6 @@
 package com.nnte.ac_backend.sqlite;
 
+import com.nnte.ac_business.config.WorkDBConfig;
 import com.nnte.framework.base.DynamicDatabaseSourceHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,7 @@ import java.sql.*;
 //Sqlite3 local init and config class
 @Component
 public class sqlite3Local {
-    private final static String localDbsrcName="sqlite3db";
+    private final static String localDbsrcName= WorkDBConfig.DB_NAME;
     @Autowired
     private DynamicDatabaseSourceHolder ddsh;
 

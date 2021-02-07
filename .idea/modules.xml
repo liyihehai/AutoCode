@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ac_backend/ac_backend.iml" filepath="$PROJECT_DIR$/ac_backend/ac_backend.iml" />
       <module fileurl="file://$PROJECT_DIR$/ac_business/ac_business.iml" filepath="$PROJECT_DIR$/ac_business/ac_business.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ac_static/ac_static.iml" filepath="$PROJECT_DIR$/ac_static/ac_static.iml" />
     </modules>
   </component>
 </project>

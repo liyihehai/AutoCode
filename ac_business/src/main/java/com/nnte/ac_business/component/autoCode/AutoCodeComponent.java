@@ -1,5 +1,6 @@
 package com.nnte.ac_business.component.autoCode;
 
+import com.nnte.ac_business.config.WorkDBConfig;
 import com.nnte.ac_business.entity.ErrorCodeLib;
 import com.nnte.ac_business.mapper.confdb.ProjectMain;
 import com.nnte.ac_business.mapper.confdb.ProjectMainService;
@@ -106,7 +107,7 @@ public class AutoCodeComponent {
     }
 
     //新增或更改项目
-    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name,autocommit = false)
+    @DBSrcTranc(value = WorkDBConfig.DB_NAME,autocommit = false)
     public Map<String,Object> saveProject(ProjectMain pm){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
         try {
@@ -191,7 +192,7 @@ public class AutoCodeComponent {
     }
 
     //删除项目
-    @DBSrcTranc(value = DBSrcTranc.Config_DBSrc_Name)
+    @DBSrcTranc(value = WorkDBConfig.DB_NAME)
     public Map<String,Object> delSingleProject(Integer projectCode){
         Map<String,Object> ret = BaseNnte.newMapRetObj();
         BaseService.ConnDaoSession session = BaseService.getThreadLocalSession();
